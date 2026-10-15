@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reps – Weekly Lift Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#10151F;--s1:#182030;--s2:#212B40;--ink:#E3E8F1;--mute:#8E9AB4;--line:#2B3752;--acc:#58C4CC;--on:#0F1A1E;--hl:#EE7F6D;--body:#37425C;--up:#7DD69A;--dn:#F0A55F;
+box-sizing:border-box}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#F1F4F9;--s1:#fff;--s2:#E7ECF4;--ink:#1B2335;--mute:#66728C;--line:#D7DEEA;--acc:#1B8C96;--on:#fff;--hl:#E2584A;--body:#CBD3E3;--up:#1E9650;--dn:#C26A12}}
+:root[data-theme="light"]{--bg:#F1F4F9;--s1:#fff;--s2:#E7ECF4;--ink:#1B2335;--mute:#66728C;--line:#D7DEEA;--acc:#1B8C96;--on:#fff;--hl:#E2584A;--body:#CBD3E3;--up:#1E9650;--dn:#C26A12}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 "DM Sans",system-ui,sans-serif;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+main{flex:1;width:100%;max-width:520px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) 16px 24px}
+h1,b,.num{font-family:"Space Grotesk","DM Sans",system-ui,sans-serif}
+h1{margin:0;font-size:30px;font-weight:700}
+b{font-weight:600}
+.sub{color:var(--mute);font-size:13px}
+.note{color:var(--mute);margin:2px 0 14px;font-size:14px}
+.plans{display:flex;gap:8px;overflow-x:auto;padding:14px 0 10px;scrollbar-width:none}
+.plans::-webkit-scrollbar{display:none}
+.pill{flex:none;min-height:42px;padding:0 16px;border-radius:21px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font:500 15px "DM Sans",sans-serif;cursor:pointer}
+.pill.on{background:var(--acc);border-color:var(--acc);color:var(--on);font-weight:600}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px}
+.top{display:flex;gap:12px;align-items:center}
+.meta{display:flex;flex-direction:column;gap:2px;min-width:0}
+.meta b{font-size:17px;line-height:1.2}
+.img{position:relative;width:84px;height:84px;flex:none;background:var(--s2);border-radius:16px;display:flex;align-items:center;justify-content:center;padding:4px}
+.mus{position:absolute;right:-5px;bottom:-5px;width:30px;height:36px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:2px;display:flex;align-items:center;justify-content:center}
+.img svg{max-width:100%;max-height:100%}
+.big .img{width:104px;height:122px}
+.tag{font-style:normal;font-size:11px;padding:1px 8px;border-radius:9px;background:var(--s2);color:var(--mute);margin-left:4px}
+.sets{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.sets:empty{display:none}
+.chip{display:inline-flex;align-items:center;gap:2px;background:var(--s2);border-radius:12px;padding:3px 4px 3px 11px;font-size:14px;font-weight:500}
+.chip button{background:none;border:0;color:var(--mute);font-size:18px;min-width:30px;min-height:30px;cursor:pointer}
+.add{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-top:12px}
+.add label{font-size:12px;color:var(--mute);display:block}
+input{width:100%;min-height:46px;margin-top:3px;font:500 17px "DM Sans",sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 12px}
+input:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.btn{min-height:46px;padding:0 18px;border:0;border-radius:12px;background:var(--acc);color:var(--on);font:600 15px "DM Sans",sans-serif;cursor:pointer}
+.btn:active{transform:scale(.97)}
+.wk{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.wk>div{text-align:center;display:flex;flex-direction:column}
+.wk button{width:46px;height:46px;border-radius:23px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font-size:22px;cursor:pointer}
+.wk button:disabled{opacity:.35}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.stat .num{font-size:30px;font-weight:700;line-height:1.1}
+.stat span{color:var(--mute);font-size:13px;display:block}
+.bar{display:grid;grid-template-columns:92px 1fr 22px;gap:10px;align-items:center;margin-top:8px;font-size:14px}
+.bar i{display:block;height:10px;border-radius:5px;background:var(--hl)}
+.h{font:600 18px "Space Grotesk",sans-serif;margin:18px 0 10px}
+.tg{display:inline-block;margin-top:2px;font-size:12px;font-weight:600;padding:1px 8px;border-radius:9px;background:var(--s2);color:var(--mute);align-self:flex-start}
+.tg.up{color:var(--up)}.tg.dn{color:var(--dn)}.tg.new{color:var(--acc)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gc{background:var(--s1);border:1px solid var(--line);border-radius:18px;padding:10px;color:var(--ink);text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:3px}
+.gc .img{width:100%;height:124px;margin-bottom:4px}
+.gc b{font-size:16px;line-height:1.2}
+.back{background:none;border:0;color:var(--acc);font:600 16px "DM Sans",sans-serif;min-height:44px;padding:0;cursor:pointer}
+.empty{text-align:center;color:var(--mute);padding:28px 10px}
+nav{position:sticky;bottom:0;z-index:5;flex:none;display:flex;background:var(--s1);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;min-height:62px;padding:22px 0 0;background:none;border:0;border-top:3px solid transparent;color:var(--mute);font:600 15px "DM Sans",sans-serif;cursor:pointer}
+nav button[aria-selected="true"]{color:var(--acc);border-top-color:var(--acc)}
+.strip{display:flex;align-items:center;gap:6px;margin:6px 0 4px}
+.strip .plans{flex:1;min-width:0;padding:8px 0;scroll-behavior:smooth}
+.arr{flex:none;width:40px;height:40px;border-radius:20px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font-size:22px;cursor:pointer}
+.poses{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px}
+.poses figure{margin:0;text-align:center;background:var(--s2);border-radius:14px;padding:6px 4px}
+.poses svg{width:100%;height:112px}
+.poses figcaption{color:var(--mute);font-size:12px;margin-top:2px}
+#app{margin-top:12px}
+.rm{margin-top:10px;background:none;border:1px solid var(--line);color:var(--mute);border-radius:10px;min-height:40px;padding:0 14px;font:500 14px "DM Sans",sans-serif;cursor:pointer}
+.rm.on{border-color:var(--dn);color:var(--dn)}
+html{background:var(--bg)}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#10151F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Reps">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<meta name="format-detection" content="telephone=no">
+</head>
+<body>
+<main>
+  <h1>Reps</h1>
+  <div class="sub" id="date"></div>
+  <div id="app"></div>
+</main>
+<nav>
+  <button data-tab="train" aria-selected="true">Train</button>
+  <button data-tab="week" aria-selected="false">Week</button>
+  <button data-tab="lib" aria-selected="false">Exercises</button>
+</nav>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+var G={chest:"Chest",shoulders:"Shoulders",rdelt:"Rear delts",back:"Back",lowback:"Lower back",biceps:"Biceps",triceps:"Triceps",abs:"Abs",quads:"Quads",hams:"Hamstrings",glutes:"Glutes",calves:"Calves"};
+var LIB=("incdb|Incline dumbbell press|chest|Dumbbell;incm|Incline chest press|chest|Machine;pec|Pec deck|chest|Machine;flies|Cable flies|chest|Cable;"+
+"mlat|Machine lateral raises|shoulders|Machine;clat|Cable lateral raises|shoulders|Cable;shp|Shoulder press|shoulders|Machine;rfly|Reverse fly machine|rdelt|Machine;"+
+"lat|Lat pulldown|back|Cable;mrow|Machine rows|back|Machine;tbar|T-bar rows|back|Barbell;sarow|Single-arm cable row|back|Cable;bext|Back extensions|lowback|Machine;"+
+"pcurl|Preacher curl|biceps|Machine;bay|Bayesian curl|biceps|Cable;hcurl|Hammer curls|biceps|Dumbbell;"+
+"tpush|Triceps pushdown|triceps|Cable;oext|Cable overhead extension|triceps|Cable;dips|Dips|triceps|Bodyweight;"+
+"crunch|Machine ab crunch|abs|Machine;squat|Squat|quads|Barbell;lext|Leg extension|quads|Machine;lpress|Leg press|quads|Machine;"+
+"lcurl|Leg curl|hams|Machine;hthrust|Hip thrust|glutes|Barbell;calf|Standing calf raise|calves|Machine").split(";").map(function(s){var a=s.split("|");return{id:a[0],n:a[1],g:a[2],q:a[3]};});
+var X={};LIB.forEach(function(x){X[x.id]=x;});
+var P=[
+{n:"Push day",t:"2 sets of 6–12 reps, 0–2 RiR",e:"incm flies shp clat oext dips"},
+{n:"Pull day",t:"2 sets of 6–12 reps, 0–2 RiR",e:"lat tbar sarow rfly bay hcurl"},
+{n:"Leg day",t:"2 sets of 6–12 reps",e:"lext lpress lcurl hthrust calf bext"},
+{n:"Upper body",t:"2 sets of 6–12 reps",e:"incdb pec mlat lat mrow tpush pcurl"},
+{n:"Lower body",t:"2–3 sets of 6–12 reps",e:"lcurl squat lext hthrust calf crunch"}];
+
+/* muscle images: body silhouette with the worked muscle highlighted */
+var BODY='<g fill="var(--body)"><circle cx="50" cy="13" r="9"/><rect x="45" y="20" width="10" height="10" rx="3"/><path d="M31 30Q50 25 69 30L65 90Q50 96 35 90Z"/><rect x="19" y="30" width="12" height="42" rx="6"/><rect x="69" y="30" width="12" height="42" rx="6"/><rect x="17" y="70" width="11" height="38" rx="5"/><rect x="72" y="70" width="11" height="38" rx="5"/><rect x="34" y="90" width="15" height="52" rx="7"/><rect x="51" y="90" width="15" height="52" rx="7"/><rect x="35" y="140" width="12" height="46" rx="6"/><rect x="53" y="140" width="12" height="46" rx="6"/></g>';
+var SH='<circle cx="29" cy="34" r="7"/><circle cx="71" cy="34" r="7"/>',AR='<rect x="21" y="40" width="9" height="22" rx="4"/><rect x="70" y="40" width="9" height="22" rx="4"/>';
+var M={chest:'<ellipse cx="42" cy="41" rx="9" ry="7"/><ellipse cx="58" cy="41" rx="9" ry="7"/>',shoulders:SH,rdelt:SH,biceps:AR,triceps:AR,
+abs:'<rect x="43" y="54" width="14" height="32" rx="5"/>',back:'<path d="M36 32L64 32L61 66L39 66Z"/>',lowback:'<rect x="41" y="68" width="18" height="16" rx="5"/>',
+quads:'<rect x="35" y="96" width="13" height="42" rx="6"/><rect x="52" y="96" width="13" height="42" rx="6"/>',
+hams:'<rect x="35" y="106" width="13" height="32" rx="6"/><rect x="52" y="106" width="13" height="32" rx="6"/>',
+glutes:'<ellipse cx="42" cy="98" rx="9" ry="8"/><ellipse cx="58" cy="98" rx="9" ry="8"/>',
+calves:'<rect x="36" y="143" width="10" height="28" rx="5"/><rect x="54" y="143" width="10" height="28" rx="5"/>'};
+var UP=["chest","shoulders","rdelt","back","lowback","biceps","triceps","abs"];
+function img(g,n){return '<svg viewBox="'+(UP.indexOf(g)>-1?'8 2 84 106':'22 86 56 102')+'" role="img" aria-label="'+n+' works the '+G[g]+'">'+BODY+'<g fill="var(--hl)">'+M[g]+'</g></svg>';}
+
+/* movement images: stick figures built from joint angles */
+function L(a,b,c,d,w){return '<line x1="'+a+'" y1="'+b+'" x2="'+c+'" y2="'+d+'" stroke="var(--mute)" stroke-opacity=".55" stroke-width="'+(w||3)+'" stroke-linecap="round"/>';}
+var SEAT=L(36,70,66,70,5)+L(40,28,40,64,6),INC=L(36,51,60,70,9)+L(62,72,62,91,3);
+var MV={
+incdb:{p:['62,64,-135,-60,180,80,0','62,64,-135,180,180,80,0'],w:'d',d:INC},
+incm:{p:['62,64,-135,-100,125,80,0','62,64,-135,135,135,80,0'],w:'p',d:INC},
+pec:{p:['50,66,180,-90,-90,90,0','50,66,180,90,90,90,0'],w:'d',d:SEAT},
+flies:{p:['50,46,172,-90,-90,-8,8','50,46,172,90,90,-8,8'],w:'d',c:[6,6]},
+mlat:{p:['50,66,180,10,20,90,0','50,66,180,80,80,90,0'],w:'d',d:SEAT},
+clat:{p:['50,46,175,0,0,-8,8','50,46,175,75,75,-8,8'],w:'d',c:[18,90]},
+shp:{p:['50,66,180,20,170,90,0','50,66,180,160,165,90,0'],w:'d',d:SEAT},
+rfly:{p:['50,66,180,90,90,90,0','50,66,180,-95,-95,90,0'],w:'d',d:SEAT+L(60,30,60,56,6)},
+lat:{p:['50,66,190,170,175,90,0','50,66,190,-30,140,90,0'],w:'d',c:[50,-8],d:L(36,70,66,70,5)+L(60,60,76,60,5)},
+mrow:{p:['50,66,180,90,90,90,0','50,66,180,-60,80,90,0'],w:'d',d:SEAT+L(62,32,62,58,6)},
+sarow:{p:['50,66,180,95,95,90,0','50,66,180,-50,75,90,0'],w:'d',c:[94,70],d:L(36,70,66,70,5)},
+tbar:{p:['40,48,135,0,0,15,-10','40,48,135,-100,26,15,-10'],w:'p',c:[96,88]},
+bext:{p:['56,52,45,0,0,-45,-45','56,52,135,100,20,-45,-45'],w:'',d:L(50,58,62,70,8)+L(20,84,32,92,5)},
+pcurl:{p:['46,66,185,50,55,90,0','46,66,185,50,-160,90,0'],w:'d',d:L(36,70,60,70,5)+L(50,36,70,60,8)},
+bay:{p:['50,46,172,-35,-35,-8,8','50,46,172,-10,140,-8,8'],w:'d',c:[8,86]},
+hcurl:{p:['50,46,178,0,0,-8,8','50,46,178,5,150,-8,8'],w:'d'},
+tpush:{p:['50,46,170,5,105,-8,8','50,46,170,5,10,-8,8'],w:'d',c:[62,-8]},
+oext:{p:['50,46,172,170,-60,-8,8','50,46,172,172,175,-8,8'],w:'d',c:[10,60]},
+dips:{p:['48,60,170,0,0,-5,-80','48,66,170,-35,40,-5,-100'],w:'',d:L(53,64,53,91,3)+L(46,64,60,64,4)},
+squat:{p:['50,46,178,-45,142,0,0','36,64,145,-45,142,75,-25'],w:'p'},
+lext:{p:['40,60,180,20,95,90,0','40,60,180,20,95,90,100'],w:'',d:L(30,64,66,64,5)+L(32,24,32,58,6)},
+lpress:{p:['36,70,-125,45,90,135,70','36,70,-125,45,90,115,115'],w:'',d:L(12,60,34,78,8)+L(79,30,79,80,4)},
+lcurl:{p:['45,70,-90,-60,-80,90,90','45,70,-90,-60,-80,90,170'],w:'',d:L(8,75,84,75,5)},
+hthrust:{p:['58,76,-112,20,20,115,0','60,56,-65,20,20,60,0'],w:'h',d:L(8,74,38,74,8)+L(14,78,14,91,6)},
+calf:{p:['50,40,180,20,10,0,0','50,32,180,20,10,0,0'],w:'s',d:L(68,6,68,84,3)+L(40,86,60,86,4)},
+crunch:{p:['50,66,185,30,150,85,0','50,66,150,30,150,85,0'],w:'d',d:L(36,70,66,70,5)+L(34,40,34,64,6)}
+};
+function pt(x,y,a,l){a=a*Math.PI/180;return[x+l*Math.sin(a),y+l*Math.cos(a)];}
+function pl(a,c){return '<polyline points="'+a.map(function(q){return q[0].toFixed(1)+','+q[1].toFixed(1);}).join(' ')+'" fill="none" stroke="'+c+'" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>';}
+function mv(id,i){
+  var m=MV[id],p=m.p[i].split(',').map(Number),sh=pt(p[0],p[1],p[2],26),el=pt(sh[0],sh[1],p[3],15),ha=pt(el[0],el[1],p[4],14),kn=pt(p[0],p[1],p[5],22),ft=pt(kn[0],kn[1],p[6],22),hd=pt(sh[0],sh[1],p[2],12),hp=[p[0],p[1]],o='',q='';
+  if(m.c)o=L(ha[0],ha[1],m.c[0],m.c[1],1.8)+'<circle cx="'+m.c[0]+'" cy="'+m.c[1]+'" r="3" fill="var(--mute)"/>';
+  if(m.w==='d')q='<circle cx="'+ha[0]+'" cy="'+ha[1]+'" r="4.5" fill="var(--hl)"/>';
+  if(m.w==='p')q='<circle cx="'+ha[0]+'" cy="'+ha[1]+'" r="7" fill="var(--hl)" fill-opacity=".45" stroke="var(--hl)" stroke-width="2"/>';
+  if(m.w==='h')q='<circle cx="'+hp[0]+'" cy="'+hp[1]+'" r="7" fill="var(--hl)" fill-opacity=".45" stroke="var(--hl)" stroke-width="2"/>';
+  if(m.w==='s')q='<rect x="'+(sh[0]-11)+'" y="'+(sh[1]-8)+'" width="22" height="7" rx="3.5" fill="var(--hl)"/>';
+  return '<svg viewBox="0 -12 100 106" role="img" aria-label="'+X[id].n+'"><line x1="2" y1="91" x2="98" y2="91" stroke="var(--line)" stroke-width="2"/>'+(m.d||'')+o+pl([sh,hp],'var(--ink)')+pl([hp,kn,ft],'var(--ink)')+pl([sh,el,ha],'var(--acc)')+'<circle cx="'+hd[0]+'" cy="'+hd[1]+'" r="6" fill="var(--s2)" stroke="var(--ink)" stroke-width="3.5"/>'+q+'</svg>';
+}
+function pic(x){return '<div class="img">'+mv(x.id,1)+'<span class="mus">'+img(x.g,x.n)+'</span></div>';}
+function poses(id){var x=X[id];return '<div class="card poses"><figure>'+mv(id,0)+'<figcaption>Start</figcaption></figure><figure>'+mv(id,1)+'<figcaption>Finish</figcaption></figure><figure>'+img(x.g,x.n)+'<figcaption>Muscle</figcaption></figure></div>';}
+
+/* data */
+var KEY="reps-v2",S={logs:[]},St={tab:"train",plan:0,off:0,grp:"all",open:null};
+try{var r=JSON.parse(localStorage.getItem(KEY));if(r&&r.logs)S=r;}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function pad(n){return(n<10?"0":"")+n;}
+function iso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+function wkStart(d){var x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x;}
+function fmt(d){return d.toLocaleDateString(undefined,{day:"numeric",month:"short"});}
+function k(n){return(+n).toFixed(1).replace(/\.0$/,"");}
+function add(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+var TODAY=iso(new Date());
+$("date").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long"});
+
+function last(id){var l=S.logs.filter(function(o){return o.ex===id&&o.date<TODAY;});if(!l.length)return null;var d=l.map(function(o){return o.date;}).sort().pop();return l.filter(function(o){return o.date===d;});}
+function range(a,b,id){return S.logs.filter(function(o){return o.date>=iso(a)&&o.date<=iso(b)&&X[o.ex]&&(!id||o.ex===id);});}
+
+function card(id,big){
+  var x=X[id],td=S.logs.filter(function(o){return o.ex===id&&o.date===TODAY;}),ls=last(id),ref=td.length?td[td.length-1]:(ls?ls[ls.length-1]:null);
+  return '<div class="card'+(big?' big':'')+'"><div class="top">'+pic(x)+'<div class="meta"><b>'+x.n+'</b><span class="sub">'+G[x.g]+'<i class="tag">'+x.q+'</i></span><span class="sub">'+(ls?'Last time: '+ls.map(function(o){return k(o.kg)+' × '+o.reps;}).join(", "):'No history yet')+'</span></div></div>'+
+  '<div class="sets">'+td.map(function(o){return '<span class="chip">'+k(o.kg)+' kg × '+o.reps+'<button data-del="'+o.id+'" aria-label="Delete set">×</button></span>';}).join("")+'</div>'+
+  '<div class="add"><label>kg<input id="kg-'+id+'" type="number" inputmode="decimal" step="0.5" min="0" value="'+(ref?ref.kg:"")+'"></label><label>reps<input id="rp-'+id+'" type="number" inputmode="numeric" min="1" value="'+(ref?ref.reps:"")+'"></label><button class="btn" data-add="'+id+'">Add set</button></div></div>';
+}
+
+function vTrain(){
+  var p=P[St.plan],ids=p.e.split(" "),done=ids.filter(function(i){return S.logs.some(function(o){return o.ex===i&&o.date===TODAY;});}).length;
+  return strip(P.map(function(q,i){return '<button class="pill'+(i===St.plan?' on':'')+'" data-plan="'+i+'">'+q.n+'</button>';}).join(""))+'<p class="note">Target: '+p.t+'. Started '+done+' of '+ids.length+' exercises today.</p>'+ids.map(function(i){return card(i);}).join("");
+}
+
+function vWeek(){
+  var s=add(wkStart(new Date()),7*St.off),e=add(s,6),W=range(s,e),V=range(add(s,-7),add(s,-1));
+  var vol=function(l){return l.reduce(function(t,o){return t+o.kg*o.reps;},0);},v=vol(W),pv=vol(V),dv=pv?Math.round((v-pv)/pv*100):null;
+  var days={};W.forEach(function(o){days[o.date]=1;});
+  var reps=W.reduce(function(t,o){return t+o.reps;},0);
+  var nav='<div class="wk"><button data-wk="-1" aria-label="Previous week">‹</button><div><b>'+fmt(s)+' – '+fmt(e)+'</b><span class="sub">'+(St.off===0?'This week':St.off===-1?'Last week':Math.abs(St.off)+' weeks ago')+'</span></div><button data-wk="1" aria-label="Next week"'+(St.off>=0?' disabled':'')+'>›</button></div>';
+  if(!W.length)return nav+'<div class="card empty">Nothing logged this week yet.<br>Pick a day in Train and add your first set.</div>';
+  var st='<div class="stats"><div class="stat"><div class="num">'+Object.keys(days).length+'</div><span>workout days</span></div><div class="stat"><div class="num">'+W.length+'</div><span>sets</span></div><div class="stat"><div class="num">'+reps+'</div><span>total reps</span></div><div class="stat"><div class="num">'+Math.round(v).toLocaleString()+'</div><span>kg volume'+(dv===null?'':' ('+(dv>=0?'+':'')+dv+'% vs previous)')+'</span></div></div>';
+  var gc={};W.forEach(function(o){var g=X[o.ex].g;gc[g]=(gc[g]||0)+1;});
+  var gk=Object.keys(gc).sort(function(a,b){return gc[b]-gc[a];}),mx=gc[gk[0]];
+  var mus='<div class="card"><b>Sets per muscle</b>'+gk.map(function(g){return '<div class="bar"><span>'+G[g]+'</span><i style="width:'+Math.round(gc[g]/mx*100)+'%"></i><span>'+gc[g]+'</span></div>';}).join("")+'</div>';
+  var by={};W.forEach(function(o){(by[o.ex]=by[o.ex]||[]).push(o);});
+  var rows=Object.keys(by).map(function(id){
+    var l=by[id].sort(function(a,b){return a.id-b.id;}),x=X[id],top=Math.max.apply(null,l.map(function(o){return o.kg;})),rp=l.reduce(function(t,o){return t+o.reps;},0),
+    pl=V.filter(function(o){return o.ex===id;}),pt=pl.length?Math.max.apply(null,pl.map(function(o){return o.kg;})):null,
+    d=pt===null?'<span class="tg new">New this week</span>':top>pt?'<span class="tg up">+'+k(top-pt)+' kg top weight</span>':top<pt?'<span class="tg dn">'+k(top-pt)+' kg top weight</span>':'<span class="tg">Same top weight</span>';
+    return '<div class="card"><div class="top">'+pic(x)+'<div class="meta"><b>'+x.n+'</b>'+d+'<span class="sub">'+l.length+' sets, '+rp+' reps, top '+k(top)+' kg</span></div></div><div class="sets">'+l.map(function(o){return '<span class="chip">'+k(o.kg)+' × '+o.reps+'<button data-del="'+o.id+'" aria-label="Delete set">×</button></span>';}).join("")+'</div><button class="rm'+(St.cf===id?' on':'')+'" data-rmex="'+id+'">'+(St.cf===id?'Tap again to remove all sets':'Remove exercise')+'</button></div>';
+  }).join("");
+  return nav+st+mus+'<div class="h">Exercises this week</div>'+rows;
+}
+
+function chart(id){
+  var ws=wkStart(new Date()),vals=[];
+  for(var i=7;i>=0;i--){var s=add(ws,-7*i),l=range(s,add(s,6),id);vals.push({l:fmt(s),v:l.length?Math.max.apply(null,l.map(function(o){return o.kg;})):0});}
+  var mx=Math.max.apply(null,vals.map(function(o){return o.v;}).concat([1]));
+  return '<div class="card"><b>Top weight by week (kg)</b>'+(mx>1?'<svg viewBox="0 0 320 128" style="width:100%;margin-top:8px">'+vals.map(function(o,i){var h=o.v/mx*76,x=8+i*38;return '<rect x="'+x+'" y="'+(98-Math.max(h,3))+'" width="28" height="'+Math.max(h,3)+'" rx="6" fill="'+(o.v?'var(--acc)':'var(--line)')+'"/>'+(o.v?'<text x="'+(x+14)+'" y="'+(92-h)+'" text-anchor="middle" fill="var(--ink)" font-size="11">'+k(o.v)+'</text>':'')+'<text x="'+(x+14)+'" y="116" text-anchor="middle" fill="var(--mute)" font-size="9">'+o.l+'</text>';}).join("")+'</svg>':'<p class="sub">Log a set to start this chart.</p>')+'</div>';
+}
+
+function vLib(){
+  if(St.open)return '<button class="back" data-back="1">← All exercises</button>'+poses(St.open)+card(St.open)+chart(St.open);
+  return strip('<button class="pill'+(St.grp==="all"?' on':'')+'" data-grp="all">All</button>'+Object.keys(G).map(function(g){return '<button class="pill'+(St.grp===g?' on':'')+'" data-grp="'+g+'">'+G[g]+'</button>';}).join(""))+'<div class="grid">'+
+  LIB.filter(function(x){return St.grp==="all"||x.g===St.grp;}).map(function(x){return '<button class="gc" data-open="'+x.id+'">'+pic(x)+'<b>'+x.n+'</b><span class="sub">'+G[x.g]+'</span></button>';}).join("")+'</div>';
+}
+
+function strip(inner){return '<div class="strip"><button class="arr" data-scroll="-1" aria-label="Scroll left">‹</button><div class="plans" id="plans">'+inner+'</div><button class="arr" data-scroll="1" aria-label="Scroll right">›</button></div>';}
+function render(){
+  fit();
+  var pe=$("plans"),sl=pe?pe.scrollLeft:0;
+  $("app").innerHTML=St.tab==="train"?vTrain():St.tab==="week"?vWeek():vLib();
+  pe=$("plans");if(pe)pe.scrollLeft=sl;
+  document.querySelectorAll("nav button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===St.tab);});
+}
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-tab],[data-plan],[data-add],[data-del],[data-wk],[data-grp],[data-open],[data-back],[data-scroll],[data-rmex]");
+  if(!t||t.disabled)return;
+  var d=t.dataset,y=window.scrollY,keep=false;
+  if(!("rmex" in d))St.cf=null;
+  if("scroll" in d){var pl=$("plans");if(pl)pl.scrollBy({left:(+d.scroll)*180,behavior:"smooth"});return;}
+  else if("tab" in d){St.tab=d.tab;St.open=null;}
+  else if("plan" in d)St.plan=+d.plan;
+  else if("add" in d){
+    var kg=parseFloat($("kg-"+d.add).value),rp=parseInt($("rp-"+d.add).value,10);
+    if(!(kg>=0)){$("kg-"+d.add).focus();return;}
+    if(!(rp>0)){$("rp-"+d.add).focus();return;}
+    S.logs.push({id:Date.now(),date:TODAY,ex:d.add,kg:kg,reps:rp});save();keep=true;
+  }
+  else if("rmex" in d){
+    if(St.cf===d.rmex){var s0=add(wkStart(new Date()),7*St.off),e0=add(s0,6);S.logs=S.logs.filter(function(o){return !(o.ex===d.rmex&&o.date>=iso(s0)&&o.date<=iso(e0));});save();St.cf=null;}else{St.cf=d.rmex;}
+    keep=true;
+  }
+  else if("del" in d){S.logs=S.logs.filter(function(o){return String(o.id)!==d.del;});save();keep=true;}
+  else if("wk" in d)St.off=Math.min(0,St.off+(+d.wk));
+  else if("grp" in d)St.grp=d.grp;
+  else if("open" in d)St.open=d.open;
+  else if("back" in d)St.open=null;
+  render();window.scrollTo(0,keep?y:0);
+});
+function fit(){}
+["resize","orientationchange","pageshow","focus"].forEach(function(ev){window.addEventListener(ev,function(){fit();setTimeout(fit,250);});});
+document.addEventListener("visibilitychange",function(){fit();setTimeout(fit,250);});
+fit();setTimeout(fit,300);setTimeout(fit,1200);
+render();
+})();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
+</body>
+</html>
